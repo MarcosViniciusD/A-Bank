@@ -20,12 +20,12 @@ function operacao() {
         if (action === "Criar conta") {
             criarConta();
         } else if (action === "Consultar Saldo") {
-            // Código para consultar saldo
+            mostrarDeposito()
         } else if (action === "Depositar") {
             depositar();
         } else if (action === "Sacar") {
             // Código para sacar
-        } else if (action === "Sair") { // Corrigi o "Sai" para "Sair"
+        } else if (action === "Sair") {
             console.log(chalk.bgBlue.black('Obrigado por usar o A-Bank'));
             process.exit();
         }
@@ -124,4 +124,27 @@ function lerArquivo(nomeConta) {
         flag: 'r'
     });
     return JSON.parse(contaJson);
+}
+
+//Função para alterar deposito.
+
+function mostrarDeposito(){
+    inquirer.prompt([
+        {
+            name: 'nomeConta',
+            message: 'Qual o nome da sua conta?'
+        }
+    ]).then((answer)=>{
+        const nomeConta = answer['nomeConta']
+        //verificando se a conta existe
+        if(!checarNomeConta(nomeConta)){
+            return conta.balance()
+        }
+        const conta = lerArquivo(nomeConta)
+        console.log(chalk.bgBlue.black(`Olá, o saldo da sua conta é de R$: ${conta.balance}`
+        ),
+        operacao()
+)
+    }
+).catch((err) => console.log(err))
 }
