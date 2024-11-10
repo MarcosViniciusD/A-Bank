@@ -24,7 +24,7 @@ function operacao() {
         } else if (action === "Depositar") {
             depositar();
         } else if (action === "Sacar") {
-            // Código para sacar
+            sacarDinheiro()
         } else if (action === "Sair") {
             console.log(chalk.bgBlue.black('Obrigado por usar o A-Bank'));
             process.exit();
@@ -147,4 +147,45 @@ function mostrarDeposito(){
 )
     }
 ).catch((err) => console.log(err))
+}
+
+function sacarDinheiro(){
+    inquirer.prompt([
+        {
+            name:'nomeConta',
+            message:'Qual o nome da sua conta? '
+        }
+    ]).then((answer)=>{
+        const nomeConta = answer['nomeConta'];
+
+        if(!checarNomeConta(nomeConta)){
+            return sacarDinheiro()
+        }
+
+        inquirer.prompt([
+            {
+                name: 'quantidade',
+                message: 'Valor do saque desejado?'
+            }
+        ]).then((answer)=>{
+            const quantidade = answer['quantidade']
+            sacarQuantidadeDinheiro(nomeConta,quantidade)
+        }).catch((err)=> console.log(err))
+
+    }).catch((err)=> console.log(err))
+}
+
+function sacarQuantidadeDinheiro(nomeConta, quantidade){
+    const conta = lerArquivo(nomeConta);
+
+    if(conta.balance < quantidade){
+        console.log(chalk.bgRed.black('Saldo insuficiente para o saque.'));
+        return operacao();
+    }
+    // Desconta o valor e salva o novo saldo
+    conta.balance -= quantidade;
+    fs.writeFileSync(`Contas/${nomeConta}.json`, JSON.stringify(conta), 'utf8');
+
+    console.log(chalk.bgGreen(`Saque de R$${quantidade} realizado com sucesso!`));
+    operacao();
 }
